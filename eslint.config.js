@@ -28,6 +28,7 @@ export default tseslint.config({
 		'@stylistic/indent': 'warn',
 		'@stylistic/no-tabs': 'off',
 		'@stylistic/comma-dangle': 'off',
+		'@typescript-eslint/consistent-type-imports': ['warn', { fixStyle: 'inline-type-imports' }],
 		'react-refresh/only-export-components': [
 			'warn',
 			{ allowConstantExport: true }
