@@ -16,7 +16,7 @@ export const createActionName
 	= <T extends object>(storeName: string) =>
 		(actionName: keyof T | `${keyof T & string}/${string}`): [false, string] => [
 			false,
-		`${storeName}/${actionName.toString()}`
+			`${storeName}/${actionName.toString()}`
 		]
 
 const projectName = 'custom-youtube-feed'

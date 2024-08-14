@@ -1,14 +1,15 @@
 import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
+import { type ChannelVideo } from '~hooks/useChannelQuery'
 import { createActionName, persistStoreName, type Slice } from './storeTypes'
 
 type ChannelId = string
 type VideoId = string
 
 type Video = {
+	publishedAt: number
 	thumbnail: string
 	title: string
-	publishedAt: string
 }
 
 type YoutubeState = {
@@ -21,6 +22,7 @@ const youtubeState: YoutubeState = {
 
 type YoutubeAction = {
 	addChannel: (channelId: string) => void
+	addVideo: (channelId: string, videoData: ChannelVideo['snippet']) => void
 }
 
 const actionName = createActionName<YoutubeAction>('youtube')
@@ -33,6 +35,22 @@ const createYoutubeAction: Slice<YoutubeStore, YoutubeAction> = (set, _get) => (
 				[channelId]: {}
 			}
 		}), ...actionName('addChannel'))
+	},
+
+	addVideo: (channelId, videoData) => {
+		set(state => ({
+			channels: {
+				...state.channels,
+				[channelId]: {
+					...state.channels[channelId],
+					[videoData.resourceId.videoId]: {
+						publishedAt: videoData.publishedAt,
+						thumbnail: videoData.thumbnails[3].url,
+						title: videoData.title
+					}
+				}
+			}
+		}), ...actionName('addVideo'))
 	}
 })
 

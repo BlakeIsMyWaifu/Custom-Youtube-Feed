@@ -4,7 +4,7 @@ import { type ReactNode } from 'react'
 
 export default function Mantine({ children }: { children: ReactNode }) {
 	return (
-		<MantineProvider defaultColorScheme="dark">
+		<MantineProvider defaultColorScheme='dark'>
 			{children}
 		</MantineProvider>
 	)
