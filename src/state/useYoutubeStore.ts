@@ -1,19 +1,21 @@
 import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
-import { type ChannelVideo } from '~hooks/useChannelQuery'
+import { type ChannelVideo } from '~/hooks/useChannelQuery'
 import { createActionName, persistStoreName, type Slice } from './storeTypes'
 
-type ChannelId = string
-type VideoId = string
-
-type Video = {
-	publishedAt: number
-	thumbnail: string
-	title: string
+type Channel = {
+	id: string
+	handle: string
+	videos: Record<string, {
+		id: string
+		publishedAt: number
+		thumbnail: string
+		title: string
+	}>
 }
 
 type YoutubeState = {
-	channels: Record<ChannelId, Record<VideoId, Video>>
+	channels: Record<string, Channel>
 }
 
 const youtubeState: YoutubeState = {
@@ -21,18 +23,22 @@ const youtubeState: YoutubeState = {
 }
 
 type YoutubeAction = {
-	addChannel: (channelId: string) => void
+	addChannel: (channelId: string, channelHandle: string) => void
 	addVideo: (channelId: string, videoData: ChannelVideo['snippet']) => void
 }
 
 const actionName = createActionName<YoutubeAction>('youtube')
 
 const createYoutubeAction: Slice<YoutubeStore, YoutubeAction> = (set, _get) => ({
-	addChannel: channelId => {
+	addChannel: (channelId, channelHandle) => {
 		set(state => ({
 			channels: {
 				...state.channels,
-				[channelId]: {}
+				[channelId]: {
+					id: channelId,
+					handle: channelHandle,
+					videos: {}
+				}
 			}
 		}), ...actionName('addChannel'))
 	},
@@ -43,10 +49,14 @@ const createYoutubeAction: Slice<YoutubeStore, YoutubeAction> = (set, _get) => (
 				...state.channels,
 				[channelId]: {
 					...state.channels[channelId],
-					[videoData.resourceId.videoId]: {
-						publishedAt: videoData.publishedAt,
-						thumbnail: videoData.thumbnails[3].url,
-						title: videoData.title
+					videos: {
+						...state.channels[channelId].videos,
+						[videoData.resourceId.videoId]: {
+							id: videoData.resourceId.videoId,
+							publishedAt: videoData.publishedAt,
+							thumbnail: videoData.thumbnails[3].url,
+							title: videoData.title
+						}
 					}
 				}
 			}

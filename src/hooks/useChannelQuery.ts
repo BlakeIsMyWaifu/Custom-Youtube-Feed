@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 import { useYoutubeStore } from '~/state/useYoutubeStore'
-import fetchJson from '~utils/fetchJson'
+import fetchJson from '~/utils/fetchJson'
 
 interface YoutubeResponse {
 	etag: string
@@ -42,10 +42,10 @@ export default function useChannelQuery() {
 
 	return useMutation({
 		mutationFn: async (channelHandle: string) => {
-			const channelList = await fetchJson<ChannelListResponse>(`https://yt.lemnoslife.com/channels?&handle=@${channelHandle}`)
+			const channelList = await fetchJson<ChannelListResponse>(`https://yt.lemnoslife.com/channels?handle=@${channelHandle}`)
 			const channelId = channelList.items[0].id
 
-			addChannel(channelId)
+			addChannel(channelId, channelHandle)
 
 			const formattedId = channelId.replace('UC', 'UULF')
 			const playlist = await fetchJson<PlaylistResponse>(`https://yt.lemnoslife.com/playlistItems?part=snippet&playlistId=${formattedId}`)

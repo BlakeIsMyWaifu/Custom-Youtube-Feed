@@ -1,7 +1,7 @@
 import { ActionIcon, Group, Image, rem, TextInput, Title } from '@mantine/core'
 import { IconArrowRight, IconSearch } from '@tabler/icons-react'
 import { useState } from 'react'
-import useChannelQuery from '~hooks/useChannelQuery'
+import useChannelQuery from '~/hooks/useChannelQuery'
 import YouTubeLogo from '/youtube.svg'
 
 export default function Header() {
