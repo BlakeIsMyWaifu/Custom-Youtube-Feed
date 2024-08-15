@@ -1,16 +1,22 @@
 import { useMutation } from '@tanstack/react-query'
 import { useYoutubeStore } from '~/state/useYoutubeStore'
+import fetchJson from '~utils/fetchJson'
 
-type ChannelQueryResponse = {
-	kind: string
+interface YoutubeResponse {
 	etag: string
+	kind: string
+}
+
+interface ChannelListResponse extends YoutubeResponse {
+	items: [{ id: string } & YoutubeResponse]
+}
+
+interface PlaylistResponse extends YoutubeResponse {
 	nextPageToken: string
 	items: ChannelVideo[]
 }
 
-export type ChannelVideo = {
-	kind: string
-	etag: string
+export interface ChannelVideo extends YoutubeResponse {
 	snippet: {
 		publishedAt: number
 		title: string
@@ -35,14 +41,16 @@ export default function useChannelQuery() {
 	const addVideo = useYoutubeStore(state => state.addVideo)
 
 	return useMutation({
-		mutationFn: async (channelId: string) => {
+		mutationFn: async (channelHandle: string) => {
+			const channelList = await fetchJson<ChannelListResponse>(`https://yt.lemnoslife.com/channels?&handle=@${channelHandle}`)
+			const channelId = channelList.items[0].id
+
 			addChannel(channelId)
 
 			const formattedId = channelId.replace('UC', 'UULF')
-			const response = await fetch(`https://yt.lemnoslife.com/playlistItems?part=snippet&playlistId=${formattedId}`)
-			const channelData = await (response.json() as Promise<ChannelQueryResponse>)
+			const playlist = await fetchJson<PlaylistResponse>(`https://yt.lemnoslife.com/playlistItems?part=snippet&playlistId=${formattedId}`)
 			for (let i = 0; i < FETCH_HISTORY_AMOUNT; i++) {
-				const videoData = channelData.items[i].snippet
+				const videoData = playlist.items[i].snippet
 				addVideo(channelId, videoData)
 			}
 		}

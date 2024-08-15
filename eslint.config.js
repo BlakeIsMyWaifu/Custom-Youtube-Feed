@@ -43,6 +43,7 @@ export default tseslint.config({
 		'@stylistic/quotes': ['warn', 'single'],
 		'@stylistic/jsx-quotes': ['warn', 'prefer-single'],
 		'@stylistic/arrow-parens': ['warn', 'as-needed'],
+		'@stylistic/jsx-indent-props': 'off',
 		...react.configs.recommended.rules,
 		...react.configs['jsx-runtime'].rules,
 		'@typescript-eslint/consistent-type-imports': ['warn', { fixStyle: 'inline-type-imports' }],
