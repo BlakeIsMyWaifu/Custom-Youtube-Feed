@@ -44,6 +44,7 @@ export default tseslint.config({
 		'@stylistic/jsx-quotes': ['warn', 'prefer-single'],
 		'@stylistic/arrow-parens': ['warn', 'as-needed'],
 		'@stylistic/jsx-indent-props': 'off',
+		'@stylistic/brace-style': ['warn', '1tbs'],
 		...react.configs.recommended.rules,
 		...react.configs['jsx-runtime'].rules,
 		'@typescript-eslint/consistent-type-imports': ['warn', { fixStyle: 'inline-type-imports' }],

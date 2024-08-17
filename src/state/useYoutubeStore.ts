@@ -16,20 +16,30 @@ type Channel = {
 
 type YoutubeState = {
 	channels: Record<string, Channel>
+	categories: {
+		id: string
+		items: string[]
+	}[]
 }
 
 const youtubeState: YoutubeState = {
-	channels: {}
+	channels: {},
+	categories: [
+		{ id: 'Uncategorised', items: [] }
+	]
 }
 
 type YoutubeAction = {
 	addChannel: (channelId: string, channelHandle: string) => void
 	addVideo: (channelId: string, videoData: ChannelVideo['snippet']) => void
+
+	updateCategories: (categories: YoutubeState['categories']) => void
+	addCategory: (category: string) => void
 }
 
 const actionName = createActionName<YoutubeAction>('youtube')
 
-const createYoutubeAction: Slice<YoutubeStore, YoutubeAction> = (set, _get) => ({
+const createYoutubeAction: Slice<YoutubeStore, YoutubeAction> = (set, get) => ({
 	addChannel: (channelId, channelHandle) => {
 		set(state => ({
 			channels: {
@@ -40,7 +50,12 @@ const createYoutubeAction: Slice<YoutubeStore, YoutubeAction> = (set, _get) => (
 					videos: {}
 				}
 			}
-		}), ...actionName('addChannel'))
+		}), ...actionName('addChannel/channels'))
+
+		const categories = structuredClone(get().categories)
+		const uncategorisedIndex = categories.findIndex(category => category.id === 'Uncategorised')
+		categories[uncategorisedIndex].items.push(channelId)
+		set({ categories }, ...actionName('addChannel/category'))
 	},
 
 	addVideo: (channelId, videoData) => {
@@ -61,6 +76,19 @@ const createYoutubeAction: Slice<YoutubeStore, YoutubeAction> = (set, _get) => (
 				}
 			}
 		}), ...actionName('addVideo'))
+	},
+
+	updateCategories: categories => {
+		set({ categories }, ...actionName('updateCategories'))
+	},
+
+	addCategory: category => {
+		set(state => ({
+			categories: [
+				...state.categories,
+				{ id: category, items: [] }
+			]
+		}), ...actionName('addCategory'))
 	}
 })
 
