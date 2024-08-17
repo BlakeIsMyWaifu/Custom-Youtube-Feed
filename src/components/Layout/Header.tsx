@@ -1,13 +1,16 @@
 import { Group, Image, Title } from '@mantine/core'
 import { IconArrowRight, IconSearch } from '@tabler/icons-react'
-import useChannelQuery from '~/hooks/useChannelQuery'
 import TextInputButton from '~/components/TextInputButton'
+import useChannelQuery from '~/hooks/useChannelQuery'
+import { useYoutubeStore } from '~/state/useYoutubeStore'
 import YouTubeLogo from '/youtube.svg'
 
 export default function Header() {
+	const channels = useYoutubeStore(state => state.channels)
 	const channelQuery = useChannelQuery()
 
 	const searchSubmit = (inputValue: string) => {
+		if (Object.values(channels).find(channel => channel.handle === inputValue)) return
 		channelQuery.mutate(inputValue)
 	}
 
