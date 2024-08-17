@@ -11,20 +11,43 @@ interface YoutubeResponse {
 	kind: string
 }
 
-interface ChannelListResponse extends YoutubeResponse {
-	items: [{ id: string } & YoutubeResponse]
+interface SearchResponse extends YoutubeResponse {
+	nextPageToken: string
+	items: SearchItem[]
+}
+
+interface SearchItem extends YoutubeResponse {
+	id: YoutubeResponse
+	snippet: {
+		channelId: string
+		title: string
+		thumbnails: ThumbnailData[]
+		channelTitle: string
+		channelHandle: string
+		timestamp: string
+		duration: number
+		views: number
+		badges: string[]
+		channelApproval: string
+		channelThumbnails: ThumbnailData[]
+		detailedMetadataSnippet: {
+			text: string
+			bold?: true
+		}[]
+		chapters: unknown[]
+	}
 }
 
 interface PlaylistResponse extends YoutubeResponse {
 	nextPageToken: string
-	items: ChannelVideo[]
+	items: PlaylistItem[]
 }
 
-export interface ChannelVideo extends YoutubeResponse {
+export interface PlaylistItem extends YoutubeResponse {
 	snippet: {
 		publishedAt: number
 		title: string
-		thumbnails: [ThumbnailData, ThumbnailData, ThumbnailData, ThumbnailData]
+		thumbnails: ThumbnailData[]
 		resourceId: {
 			kind: string
 			videoId: string
@@ -47,10 +70,11 @@ export default function useChannelQuery() {
 	const activeNotifications = useMap<string, string>()
 
 	return useMutation({
-		mutationFn: async (channelHandle: string) => {
-			const channelList = await fetchJson<ChannelListResponse>(`https://yt.lemnoslife.com/channels?handle=@${channelHandle}`)
-			const channelId = channelList.items[0].id
-			addChannel(channelId, channelHandle)
+		mutationFn: async (searchValue: string) => {
+			const search = await fetchJson<SearchResponse>(`https://yt.lemnoslife.com/search?part=snippet&q=${searchValue}`)
+			const { snippet: { channelId, channelHandle, channelTitle } } = search.items[0]
+
+			addChannel(channelId, channelHandle, channelTitle)
 
 			const formattedId = channelId.replace('UC', 'UULF')
 			const playlist = await fetchJson<PlaylistResponse>(`https://yt.lemnoslife.com/playlistItems?part=snippet&playlistId=${formattedId}`)
@@ -63,7 +87,7 @@ export default function useChannelQuery() {
 			const notificationId = notifications.show({
 				loading: true,
 				color: 'green',
-				title: `Importing videos from ${variable}`,
+				title: `Searching for videos from ${variable}`,
 				message: 'This should only take a few seconds',
 				autoClose: false,
 				withCloseButton: false

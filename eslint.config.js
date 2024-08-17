@@ -50,6 +50,7 @@ export default tseslint.config({
 		'@typescript-eslint/consistent-type-imports': ['warn', { fixStyle: 'inline-type-imports' }],
 		'@typescript-eslint/no-unused-vars': ['warn', {
 			vars: 'all',
+			varsIgnorePattern: '^_',
 			args: 'after-used',
 			argsIgnorePattern: '^_'
 		}],

@@ -1,10 +1,10 @@
 import { Card, CloseButton, type ElementProps, Group, Image, type ImageProps, Stack, Text, UnstyledButton, type UnstyledButtonProps } from '@mantine/core'
 import { forwardRef } from 'react'
-import { useYoutubeStore } from '~/state/useYoutubeStore'
+import { type Channel, type Video } from '~/state/useYoutubeStore'
 
-type VideoProps = {
-	channelId: string
-	videoId: string
+export type VideoProps = {
+	channel: Omit<Channel, 'videos'>
+	video: Video
 }
 
 type ImageButtonProps = UnstyledButtonProps & ImageProps & ElementProps<'button'>
@@ -12,15 +12,12 @@ const ImageButton = forwardRef<HTMLImageElement, ImageButtonProps>(function Imag
 	return <UnstyledButton {...props} ref={ref} component={Image} />
 })
 
-export default function Video({ channelId, videoId }: VideoProps) {
-	const channel = useYoutubeStore(state => state.channels[channelId])
-	const video = channel.videos[videoId]
-
+export default function Video({ channel, video }: VideoProps) {
 	return (
 		<Card w={360} shadow='sm' padding='xs' radius='md' withBorder>
 			<Stack gap={0}>
 				<Group justify='space-between'>
-					<Text fw={700}>{channel.handle}</Text>
+					<Text fw={700}>{channel.title}</Text>
 					<CloseButton />
 				</Group>
 				<Text lineClamp={1}>{video.title}</Text>
@@ -29,7 +26,7 @@ export default function Video({ channelId, videoId }: VideoProps) {
 			<Card.Section pt='sm'>
 				<ImageButton
 					src={video.thumbnail}
-					onClick={() => window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank')?.focus()}
+					onClick={() => window.open(`https://www.youtube.com/watch?v=${video.id}`, '_blank')?.focus()}
 				/>
 			</Card.Section>
 		</Card>

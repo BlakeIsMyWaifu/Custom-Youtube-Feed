@@ -1,17 +1,17 @@
-import { type ChannelVideo } from '~/hooks/useChannelQuery'
+import { type PlaylistItem } from '~/hooks/useChannelQuery'
 import { createActionName, type Slice } from './storeTypes'
 import { type YoutubeStore } from './useYoutubeStore'
 
 export type YoutubeChannelActions = {
-	addChannel: (channelId: string, channelHandle: string) => void
-	addVideo: (channelId: string, videoData: ChannelVideo['snippet']) => void
+	addChannel: (channelId: string, channelHandle: string, channelTitle: string) => void
+	addVideo: (channelId: string, videoData: PlaylistItem['snippet']) => void
 	removeChannel: (channelId: string) => void
 }
 
 const actionName = createActionName<YoutubeChannelActions>('youtube')
 
 export const createYoutubeChannelActions: Slice<YoutubeStore, YoutubeChannelActions> = (set, get) => ({
-	addChannel: (channelId, channelHandle) => {
+	addChannel: (channelId, channelHandle, channelTitle) => {
 		if (!channelId) return
 
 		set(state => ({
@@ -20,6 +20,7 @@ export const createYoutubeChannelActions: Slice<YoutubeStore, YoutubeChannelActi
 				[channelId]: {
 					id: channelId,
 					handle: channelHandle,
+					title: channelTitle,
 					videos: {}
 				}
 			}
@@ -43,7 +44,8 @@ export const createYoutubeChannelActions: Slice<YoutubeStore, YoutubeChannelActi
 						[videoData.resourceId.videoId]: {
 							id: videoData.resourceId.videoId,
 							publishedAt: videoData.publishedAt,
-							thumbnail: videoData.thumbnails[3].url,
+							// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+							thumbnail: videoData.thumbnails.at(-1)!.url,
 							title: videoData.title
 						}
 					}

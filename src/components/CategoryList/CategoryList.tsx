@@ -44,7 +44,7 @@ export default function CategoryList() {
 													style={{ maxWidth: '285px' }}
 												>
 													<Group style={{ flex: 1 }} justify='space-between'>
-														<Text h={36} size='xl'>{channels[channelId].handle}</Text>
+														<Text h={36} size='xl'>{channels[channelId].title}</Text>
 														<CloseButton onClick={() => removeChannel(channelId)} />
 													</Group>
 												</Drag>

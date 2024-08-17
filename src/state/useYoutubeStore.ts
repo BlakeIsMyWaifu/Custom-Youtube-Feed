@@ -4,15 +4,18 @@ import { persistStoreName } from './storeTypes'
 import { createYoutubeCategoryActions, type YoutubeCategoryActions } from './youtubeCategoryActions'
 import { createYoutubeChannelActions, type YoutubeChannelActions } from './youtubeChannelActions'
 
-type Channel = {
+export type Channel = {
 	id: string
 	handle: string
-	videos: Record<string, {
-		id: string
-		publishedAt: number
-		thumbnail: string
-		title: string
-	}>
+	title: string
+	videos: Record<string, Video>
+}
+
+export type Video = {
+	id: string
+	publishedAt: number
+	thumbnail: string
+	title: string
 }
 
 export type YoutubeState = {
