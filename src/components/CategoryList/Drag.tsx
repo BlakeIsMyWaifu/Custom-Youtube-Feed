@@ -9,12 +9,23 @@ interface DragProps extends GroupProps {
 	children: ReactNode
 }
 
-export default function Drag({ id, index, children, ...props }: DragProps) {
+export default function Drag({ id, index, children, style, ...props }: DragProps) {
 	return (
 		<Draggable draggableId={id} index={index}>
 			{(provided, _snapshot) => {
 				return (
-					<Group ref={provided.innerRef} gap='xs' {...provided.draggableProps} {...props}>
+					<Group
+						ref={provided.innerRef}
+						gap='xs'
+						align='flex-start'
+						w='100%'
+						{...provided.draggableProps}
+						{...props}
+						style={{
+							...provided.draggableProps.style,
+							...style
+						}}
+					>
 						<Stack h={36} justify='center' {...provided.dragHandleProps}>
 							<IconGripVertical />
 						</Stack>

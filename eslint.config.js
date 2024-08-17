@@ -53,6 +53,7 @@ export default tseslint.config({
 			args: 'after-used',
 			argsIgnorePattern: '^_'
 		}],
+		'@typescript-eslint/no-confusing-void-expression': 'off',
 		'react/self-closing-comp': [
 			'warn',
 			{
