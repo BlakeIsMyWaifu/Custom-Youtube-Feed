@@ -1,6 +1,7 @@
 import { Card, CloseButton, type ElementProps, Group, Image, type ImageProps, Stack, Text, UnstyledButton, type UnstyledButtonProps } from '@mantine/core'
+import { modals } from '@mantine/modals'
 import { forwardRef } from 'react'
-import { type Channel, type Video } from '~/state/useYoutubeStore'
+import { type Channel, useYoutubeStore, type Video } from '~/state/useYoutubeStore'
 
 export type VideoProps = {
 	channel: Omit<Channel, 'videos'>
@@ -13,12 +14,23 @@ const ImageButton = forwardRef<HTMLImageElement, ImageButtonProps>(function Imag
 })
 
 export default function Video({ channel, video }: VideoProps) {
+	const watchVideo = useYoutubeStore(state => state.watchVideo)
+
+	const watchVideoModal = () => modals.openConfirmModal({
+		title: video.title,
+		children: (
+			<Text size='sm'>Please confirm the video has been fully watched</Text>
+		),
+		labels: { confirm: 'Confirm', cancel: 'Cancel' },
+		onConfirm: () => watchVideo(channel.id, video.id)
+	})
+
 	return (
 		<Card w={360} shadow='sm' padding='xs' radius='md' withBorder>
 			<Stack gap={0}>
 				<Group justify='space-between'>
 					<Text fw={700}>{channel.title}</Text>
-					<CloseButton />
+					<CloseButton onClick={watchVideoModal} />
 				</Group>
 				<Text lineClamp={1}>{video.title}</Text>
 			</Stack>

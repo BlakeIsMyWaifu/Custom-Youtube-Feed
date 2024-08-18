@@ -1,5 +1,6 @@
 import { createTheme, MantineProvider } from '@mantine/core'
 import '@mantine/core/styles.css'
+import { ModalsProvider } from '@mantine/modals'
 import { Notifications } from '@mantine/notifications'
 import '@mantine/notifications/styles.css'
 import { type ReactNode } from 'react'
@@ -13,7 +14,9 @@ export default function Mantine({ children }: { children: ReactNode }) {
 		<MantineProvider defaultColorScheme='dark' theme={theme}>
 			<Notifications />
 
-			{children}
+			<ModalsProvider>
+				{children}
+			</ModalsProvider>
 		</MantineProvider>
 	)
 }

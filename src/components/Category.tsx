@@ -17,7 +17,9 @@ export default function Category({ category }: CategoryProps) {
 					channel,
 					video
 				})
-			}))
+			})
+			.filter(({ video }) => !video.watched)
+		)
 		.sort((a, b) => a.video.publishedAt < b.video.publishedAt ? -1 : 1)
 
 	return (

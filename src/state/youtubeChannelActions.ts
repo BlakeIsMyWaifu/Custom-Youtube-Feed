@@ -46,7 +46,8 @@ export const createYoutubeChannelActions: Slice<YoutubeStore, YoutubeChannelActi
 							publishedAt: videoData.publishedAt,
 							// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 							thumbnail: videoData.thumbnails.at(-1)!.url,
-							title: videoData.title
+							title: videoData.title,
+							watched: false
 						}
 					}
 				}

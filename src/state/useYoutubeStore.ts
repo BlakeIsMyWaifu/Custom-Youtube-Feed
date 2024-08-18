@@ -3,6 +3,7 @@ import { devtools, persist } from 'zustand/middleware'
 import { persistStoreName } from './storeTypes'
 import { createYoutubeCategoryActions, type YoutubeCategoryActions } from './youtubeCategoryActions'
 import { createYoutubeChannelActions, type YoutubeChannelActions } from './youtubeChannelActions'
+import { createYoutubeVideoActions, type YoutubeVideoActions } from './youtubeVideoActions'
 
 export type Channel = {
 	id: string
@@ -16,6 +17,7 @@ export type Video = {
 	publishedAt: number
 	thumbnail: string
 	title: string
+	watched: boolean
 }
 
 export type YoutubeState = {
@@ -33,7 +35,7 @@ const youtubeState: YoutubeState = {
 	]
 }
 
-type YoutubeActions = YoutubeChannelActions & YoutubeCategoryActions
+type YoutubeActions = YoutubeChannelActions & YoutubeCategoryActions & YoutubeVideoActions
 
 export type YoutubeStore = YoutubeState & YoutubeActions
 
@@ -42,7 +44,8 @@ export const useYoutubeStore = create<YoutubeStore>()(
 		persist((...a) => ({
 			...youtubeState,
 			...createYoutubeChannelActions(...a),
-			...createYoutubeCategoryActions(...a)
+			...createYoutubeCategoryActions(...a),
+			...createYoutubeVideoActions(...a)
 		}), { name: persistStoreName('youtube') }),
 		{ name: 'Youtube Store' })
 )
