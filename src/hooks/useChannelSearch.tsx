@@ -4,12 +4,8 @@ import { notifications } from '@mantine/notifications'
 import { IconCheck, IconX } from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
 import { useYoutubeStore } from '~/state/useYoutubeStore'
+import { type ThumbnailData, type YoutubeResponse } from '~/types/YoutubeResponse'
 import fetchJson from '~/utils/fetchJson'
-
-interface YoutubeResponse {
-	etag: string
-	kind: string
-}
 
 interface SearchResponse extends YoutubeResponse {
 	nextPageToken: string
@@ -38,50 +34,20 @@ interface SearchItem extends YoutubeResponse {
 	}
 }
 
-interface PlaylistResponse extends YoutubeResponse {
-	nextPageToken: string
-	items: PlaylistItem[]
-}
-
-export interface PlaylistItem extends YoutubeResponse {
-	snippet: {
-		publishedAt: number
-		title: string
-		thumbnails: ThumbnailData[]
-		resourceId: {
-			kind: string
-			videoId: string
-		}
-	}
-}
-
-export type ThumbnailData = {
-	url: string
-	width: number
-	height: number
-}
-
-export default function useChannelQuery() {
-	const FETCH_HISTORY_AMOUNT = 4
-
+export default function useChannelSearch() {
+	const channels = useYoutubeStore(state => state.channels)
 	const addChannel = useYoutubeStore(state => state.addChannel)
-	const addVideo = useYoutubeStore(state => state.addVideo)
 
 	const activeNotifications = useMap<string, string>()
 
 	return useMutation({
 		mutationFn: async (searchValue: string) => {
 			const search = await fetchJson<SearchResponse>(`https://yt.lemnoslife.com/search?part=snippet&q=${searchValue}`)
-			const { snippet: { channelId, channelHandle, channelTitle } } = search.items[0]
+			const { snippet: { channelId, channelHandle, channelTitle } } = search.items.find(video => video.snippet.channelHandle.toLowerCase() === `@${searchValue.toLowerCase()}`) ?? search.items[0]
+
+			if (Object.hasOwn(channels, channelId)) return
 
 			addChannel(channelId, channelHandle, channelTitle)
-
-			const formattedId = channelId.replace('UC', 'UULF')
-			const playlist = await fetchJson<PlaylistResponse>(`https://yt.lemnoslife.com/playlistItems?part=snippet&playlistId=${formattedId}`)
-			for (let i = 0; i < FETCH_HISTORY_AMOUNT; i++) {
-				const videoData = playlist.items[i].snippet
-				addVideo(channelId, videoData)
-			}
 		},
 		onMutate: variable => {
 			const notificationId = notifications.show({
@@ -106,8 +72,8 @@ export default function useChannelQuery() {
 				autoClose: 2500
 			})
 		},
-		onError: (data, variable) => {
-			console.error(data)
+		onError: (error, variable) => {
+			console.error(error)
 			const id = activeNotifications.get(variable)
 			notifications.update({
 				id,

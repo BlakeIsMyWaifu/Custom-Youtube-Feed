@@ -1,10 +1,8 @@
-import { type PlaylistItem } from '~/hooks/useChannelQuery'
 import { createActionName, type Slice } from './storeTypes'
 import { type YoutubeStore } from './useYoutubeStore'
 
 export type YoutubeChannelActions = {
 	addChannel: (channelId: string, channelHandle: string, channelTitle: string) => void
-	addVideo: (channelId: string, videoData: PlaylistItem['snippet']) => void
 	removeChannel: (channelId: string) => void
 }
 
@@ -31,28 +29,6 @@ export const createYoutubeChannelActions: Slice<YoutubeStore, YoutubeChannelActi
 		categories[uncategorisedIndex].items.push(channelId)
 
 		set({ categories }, ...actionName('addChannel/category'))
-	},
-
-	addVideo: (channelId, videoData) => {
-		set(state => ({
-			channels: {
-				...state.channels,
-				[channelId]: {
-					...state.channels[channelId],
-					videos: {
-						...state.channels[channelId].videos,
-						[videoData.resourceId.videoId]: {
-							id: videoData.resourceId.videoId,
-							publishedAt: videoData.publishedAt,
-							// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-							thumbnail: videoData.thumbnails.at(-1)!.url,
-							title: videoData.title,
-							watched: false
-						}
-					}
-				}
-			}
-		}), ...actionName('addVideo'))
 	},
 
 	removeChannel: channelId => {
